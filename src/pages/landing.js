@@ -1,41 +1,39 @@
-const Landing = (props) => {
-  const imageUrl = `${props.book.global_field.fileConnection.edges[0].node.url}?width=300`;
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import SelectedBook from "../components/SelectedBook";
+import LandingLoading from "../components/LoadingSceletons/LandingLoading";
 
-  return (
-    <>
-      <button
-        style={{
-          width: "100px",
-          height: "50px",
-        }}
-        onClick={() => props.goHome(true)}
-      >
-        Go back
-      </button>
+const Landing = () => {
+  const [data, setData] = useState();
+  const [loading, setLoading] = useState(true);
+  const { entryUid } = useParams();
 
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: "40px",
-        }}
-      >
-        <h1>{props.book.global_field.title}</h1>
-        <img src={imageUrl} alt="book" />
-        <h5>{props.book.global_field.number} pages</h5>
-        <p
-          style={{
-            width: "400px",
-            margin: "auto",
-          }}
-        >
-          {props.book.global_field.description}
-        </p>
-        <h4>Author: {props.book.global_field.author}</h4>
+  useEffect(() => {
+    if (entryUid) {
+      axios
+        .get(
+          `https://cdn.contentstack.io/v3/content_types/book_shelf/entries/${entryUid}?environment=store`,
+          {
+            headers: {
+              api_key: process.env.REACT_APP_API_KEY,
+              access_token: process.env.REACT_APP_DELIVERY_TOKEN,
+              environment: process.env.REACT_APP_ENVIRONMENT,
+              region: "eu" ? "eu" : "us",
+            },
+          }
+        )
+        .then(function (response) {
+          setData(response);
+          setLoading(false);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  }, [entryUid]);
 
-        <a href={props.book.global_field.link.href}>Go to Amazon</a>
-      </div>
-    </>
-  );
+  return loading ? <LandingLoading /> : <SelectedBook data={data} />;
 };
 
 export default Landing;

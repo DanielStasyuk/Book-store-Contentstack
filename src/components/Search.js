@@ -1,12 +1,13 @@
 import "../App.css";
 
 const Search = (props) => {
+  const { onChange } = props;
   return (
     <div className="search">
       <input
         className="input"
-        onChange={(e) => props.onChangeInput(e.target.value)}
-        placeholder="Search books"
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search book..."
         type="text"
       />
     </div>
